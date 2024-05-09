@@ -9,3 +9,16 @@ npx create-next-app@latest --ts --use-yarn
 mv ./belatura-frontend/* ./
 mv ./belatura-frontend/.* ./
 rmdir ./belatura-frontend
+
+yarn add axios
+yarn add redux
+yarn add react-redux
+yarn add @reduxjs/toolkit
+yarn add redux-thunk
+yarn add -D @types/react-redux
+yarn add @fortawesome/fontawesome-svg-core
+yarn add @fortawesome/free-solid-svg-icons
+yarn add @fortawesome/free-regular-svg-icons
+yarn add @fortawesome/free-brands-svg-icons
+yarn add @fortawesome/react-fontawesome
+yarn add prettier
