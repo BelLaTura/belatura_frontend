@@ -1,15 +1,19 @@
 import { AxiosError } from 'axios';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import CopyToClipboard from 'react-copy-to-clipboard';
 import {
-  BelaturaUserGetGenerations,
-  BelaturaUserGetMyData,
+  BellaturaUserGetGenerations,
+  BellaturaUserGetMyData,
 } from '@/utils/fetch/belatura/users';
 import styles from '@/styles/Tree.module.css';
 import AppHead from '@/components/AppHead/AppHead';
 import AppWrapper from '@/components/AppWrapper/AppWrapper';
 import AppContainer from '@/components/AppContainer/AppContainer';
-import { BelaturaUserGetBodyDto } from '@/types/belatura/api/users';
+import { BellaturaUserGetDto } from '@/types/belatura/api/users';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import { faTelegram } from '@fortawesome/free-brands-svg-icons';
 
 export default function AccountPage() {
   const route = useRouter();
@@ -17,7 +21,7 @@ export default function AccountPage() {
   const [isLogin, setIsLogin] = useState<boolean>(false);
   const [userId, setUserId] = useState<number>(0);
   const [generations, setGenerations] = useState<number>(5);
-  const [lst, setLst] = useState<BelaturaUserGetBodyDto[]>([]);
+  const [lst, setLst] = useState<BellaturaUserGetDto[]>([]);
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
   useEffect(() => {
@@ -30,7 +34,7 @@ export default function AccountPage() {
 
     (async function () {
       try {
-        const jData = await BelaturaUserGetMyData();
+        const jData = await BellaturaUserGetMyData();
         const data = jData.data;
         const userId = data.rs_id;
         setUserId(userId);
@@ -58,7 +62,7 @@ export default function AccountPage() {
         return;
       }
 
-      const jData = await BelaturaUserGetGenerations(userId, generations);
+      const jData = await BellaturaUserGetGenerations(userId, generations);
       setLst(jData.data);
     } catch (exception) {
       alert(exception);
@@ -110,7 +114,7 @@ export default function AccountPage() {
 
 interface ITree {
   userId: number;
-  lst: BelaturaUserGetBodyDto[];
+  lst: BellaturaUserGetDto[];
 }
 
 function Tree(props: ITree) {
@@ -123,9 +127,39 @@ function Tree(props: ITree) {
       <ul className={styles.tree__ul}>
         <li className={styles.tree__li}>
           <div className={styles.tree__block}>
-            <div>{candidate.rs_ref} - это мой наставник</div>
-            <div>{candidate.rs_id} - это мой идентификатор</div>
-            <div>({candidate.rs_initials_name}) - это мое имя</div>
+            <div>
+              {[
+                candidate.rs_surname,
+                candidate.rs_name,
+                candidate.rs_middlename,
+              ]
+                .filter((e) => e.length > 0)
+                .join(' ')}
+            </div>
+            <div className={styles.tree__copy_b}>
+              {candidate.rs_telegramNickname ? (
+                <CopyToClipboard
+                  text={candidate.rs_telegramNickname}
+                  onCopy={() =>
+                    alert(
+                      `Телеграм никнейм скопирован:\n${candidate.rs_telegramNickname}\nhttps://t.me/${candidate.rs_telegramNickname}`,
+                    )
+                  }>
+                  <button className={styles.form__button}>
+                    <FontAwesomeIcon icon={faTelegram} />
+                  </button>
+                </CopyToClipboard>
+              ) : null}
+              <CopyToClipboard
+                text={candidate.rs_email}
+                onCopy={() =>
+                  alert(`Скопирована электронная почта:\n${candidate.rs_email}`)
+                }>
+                <button className={styles.form__button}>
+                  <FontAwesomeIcon icon={faEnvelope} />
+                </button>
+              </CopyToClipboard>
+            </div>
           </div>
           <GetTreeNode userRef={props.userId} lst={props.lst} />
         </li>
@@ -136,7 +170,7 @@ function Tree(props: ITree) {
 
 interface IGEtTreeNode {
   userRef: number;
-  lst: BelaturaUserGetBodyDto[];
+  lst: BellaturaUserGetDto[];
 }
 
 function GetTreeNode(props: IGEtTreeNode) {
@@ -148,9 +182,35 @@ function GetTreeNode(props: IGEtTreeNode) {
           return (
             <li key={e.rs_id} className={styles.tree__li}>
               <div className={styles.tree__block}>
-                <div>{e.rs_ref} - Наставник</div>
-                <div>{e.rs_id} - идентификатор клиента</div>
-                <div>({e.rs_initials_name}) - имя клиента</div>
+                <div>
+                  {[e.rs_surname, e.rs_name, e.rs_middlename]
+                    .filter((e) => e.length > 0)
+                    .join(' ')}
+                </div>
+                <div className={styles.tree__copy_b}>
+                  {e.rs_telegramNickname ? (
+                    <CopyToClipboard
+                      text={e.rs_telegramNickname}
+                      onCopy={() =>
+                        alert(
+                          `Телеграм никнейм скопирован:\n${e.rs_telegramNickname}\nhttps://t.me/${e.rs_telegramNickname}`,
+                        )
+                      }>
+                      <button className={styles.form__button}>
+                        <FontAwesomeIcon icon={faTelegram} />
+                      </button>
+                    </CopyToClipboard>
+                  ) : null}
+                  <CopyToClipboard
+                    text={e.rs_email}
+                    onCopy={() =>
+                      alert(`Скопирована электронная почта:\n${e.rs_email}`)
+                    }>
+                    <button className={styles.form__button}>
+                      <FontAwesomeIcon icon={faEnvelope} />
+                    </button>
+                  </CopyToClipboard>
+                </div>
               </div>
               <GetTreeNode userRef={e.rs_id} lst={props.lst} />
             </li>

@@ -3,7 +3,7 @@ import { AxiosError } from 'axios';
 import AppHead from '@/components/AppHead/AppHead';
 import styles from '@/styles/SignUpPage.module.css';
 import AppWrapper from '@/components/AppWrapper/AppWrapper';
-import { BelaturaUserForgetPassword } from '@/utils/fetch/belatura/users';
+import { BellaturaUserForgetPassword } from '@/utils/fetch/belatura/users';
 
 export default function ForgetPasswordPage() {
   const [logintOrEmail, setLoginOrEmail] = useState<string>('');
@@ -15,7 +15,7 @@ export default function ForgetPasswordPage() {
     }
 
     try {
-      const jData = await BelaturaUserForgetPassword(logintOrEmail);
+      const jData = await BellaturaUserForgetPassword(logintOrEmail);
       alert(jData.message);
     } catch (exception) {
       if (

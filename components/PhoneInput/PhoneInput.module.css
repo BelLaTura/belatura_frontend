@@ -1,0 +1,93 @@
+.wrapper {
+    margin: 8px 0;
+}
+
+.phone__country_button {
+    all:unset;
+    width: calc(100% - 8px * 2 - 1px * 2);
+    padding: 8px;
+    border: 1px solid var(--site-color);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+}
+
+.phone__country_button:hover {
+    background-color: lightgray;
+}
+
+.phone__ul {
+    height: 200px;
+    overflow-y: scroll;
+    border: 1px solid var(--site-color);
+    margin: 0;
+    padding: 0;
+    border-radius: 4px;
+}
+
+.phone__ul--open {
+    display: block;
+}
+
+.phone__ul--close {
+    display: none;
+}
+
+.phone__img_b {
+    width: 24px;
+    height: 24px;
+    padding-right: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.phone__img {
+    max-width: 24px;
+    max-height: 24px;
+}
+
+.phone__label {
+    display: block;
+    font-family: 'Roboto';
+}
+
+
+.phone__code_img_b {
+    width: 24px;
+    height: 24px;
+}
+
+.phone__code_img {
+    max-width: 24px;
+    max-height: 24px;
+    margin-right: 4px;
+}
+
+.phone__b {
+    display: flex;
+    /* height: 32px; */
+    align-items: end;
+}
+
+.phone__code {
+    width: 120px;
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--site-color);
+    padding: 8px;
+    border-radius: 4px;
+    margin-right: 8px;
+    background-color: transparent;
+    height: 32px
+}
+
+.form__input {
+    all:unset;
+    width: calc(100% - 8px * 2 - 1px * 2);
+    padding: 8px;
+    border: 1px solid var(--site-color);
+    border-radius: 4px;
+    display: block;
+    height: calc(32px - 8px * 2 - 1px * 2);
+}

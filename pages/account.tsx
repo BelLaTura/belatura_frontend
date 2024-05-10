@@ -1,16 +1,25 @@
 import Link from 'next/link';
 import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+import AppEnv from '@/utils/app-env';
 import styles from '@/styles/SignUpPage.module.css';
 import AppHead from '@/components/AppHead/AppHead';
 import AppWrapper from '@/components/AppWrapper/AppWrapper';
 import AppContainer from '@/components/AppContainer/AppContainer';
-import { BelaturaUserGetMyData } from '@/utils/fetch/belatura/users';
-import { BelaturaUserGetMyDataBodyDto } from '@/types/belatura/api/users';
+import {
+  BellaturaUserGetDto,
+  BellaturaUserGetMyDataBodyDto,
+  emptyBellaturaUserGetDto,
+} from '@/types/belatura/api/users';
+import {
+  BellaturaUserFindOneById,
+  BellaturaUserGetMyData,
+} from '@/utils/fetch/belatura/users';
 
 export default function AccountPage() {
   const [isLogin, setIsLogin] = useState<boolean>(false);
-  const [data, setData] = useState<BelaturaUserGetMyDataBodyDto>({
+  const [data, setData] = useState<BellaturaUserGetMyDataBodyDto>({
     rs_address: '',
     rs_birthday: '',
     rs_email: '',
@@ -23,6 +32,9 @@ export default function AccountPage() {
     rs_surname: '',
     rs_telegramNickname: '',
   });
+  const [refData, setRefData] = useState<BellaturaUserGetDto>(
+    emptyBellaturaUserGetDto,
+  );
 
   useEffect(() => {
     const accessToken = localStorage.getItem('access') || '';
@@ -33,10 +45,12 @@ export default function AccountPage() {
 
     setIsLogin(true);
     (async function () {
+      let ref = 0;
       try {
-        const jData = await BelaturaUserGetMyData();
+        const jData = await BellaturaUserGetMyData();
         setData(jData.data);
         setIsLogin(true);
+        ref = jData.data.rs_ref;
       } catch (exception) {
         if (
           exception instanceof AxiosError &&
@@ -50,6 +64,21 @@ export default function AccountPage() {
 
         alert(exception);
         setIsLogin(false);
+      }
+
+      try {
+        const jRefData = await BellaturaUserFindOneById(ref);
+        setRefData(jRefData.data);
+      } catch (exception) {
+        if (
+          exception instanceof AxiosError &&
+          exception.response &&
+          exception.response.status === 404
+        ) {
+          setRefData(emptyBellaturaUserGetDto);
+          return;
+        }
+        alert(exception);
       }
     })();
   }, []);
@@ -68,65 +97,91 @@ export default function AccountPage() {
             <div className={styles.form}>
               <h1>Моя страница</h1>
 
+              <h3>Реферальная ссылка</h3>
               <div>
-                <label className={styles.form__label}>Реферальная ссылка</label>
-                <span className={styles.form__input}>
-                  <a href={`https://bellatura.by/sign-up/ref/${data.rs_id}`}>
-                    https://bellatura.by/sign-up/ref/{data.rs_id}
-                  </a>
-                </span>
+                <a href={`${AppEnv.WEBSITE}/sign-up/ref/${data.rs_id}`}>
+                  {AppEnv.WEBSITE}/sign-up/ref/{data.rs_id}
+                </a>
               </div>
-              <br />
-              <div>
-                <label className={styles.form__label}>Наставник</label>
-                <span className={styles.form__input}>{data.rs_ref}</span>
-              </div>
-              <br />
+              <CopyToClipboard
+                text={`${AppEnv.WEBSITE}/sign-up/ref/${data.rs_id}`}
+                onCopy={() =>
+                  alert(
+                    `Скопирована реферальная ссылка:\n${AppEnv.WEBSITE}/sign-up/ref/${data.rs_id}`,
+                  )
+                }>
+                <button className={styles.form__button}>
+                  Скопировать ссылку
+                </button>
+              </CopyToClipboard>
 
-              <div>
-                <label className={styles.form__label}>Фамилия</label>
-                <span className={styles.form__input}>{data.rs_surname}</span>
-              </div>
-              <div>
-                <label className={styles.form__label}>Имя</label>
-                <span className={styles.form__input}>{data.rs_name}</span>
-              </div>
-              <div>
-                <label className={styles.form__label}>Отчество</label>
-                <span className={styles.form__input}>{data.rs_middlename}</span>
-              </div>
-              <br />
-              <div>
-                <label className={styles.form__label}>Телефон</label>
-                <span className={styles.form__input}>{data.rs_phone}</span>
-              </div>
-
-              <div>
-                <label className={styles.form__label}>Город</label>
-                <span className={styles.form__input}>{data.rs_address}</span>
-              </div>
-              <br />
-              <div>
-                <label className={styles.form__label}>Логин</label>
-                <span className={styles.form__input}>{data.rs_login}</span>
-              </div>
-              <div>
-                <label className={styles.form__label}>E-mail</label>
-                <span className={styles.form__input}>{data.rs_email}</span>
-              </div>
-              <br />
-              <div>
-                <label className={styles.form__label}>Telegram</label>
-                <span className={styles.form__input}>
-                  {data.rs_telegramNickname ? (
-                    <a href={`https://t.me/${data.rs_telegramNickname}`}>
-                      https://t.me/{data.rs_telegramNickname}
-                    </a>
-                  ) : (
-                    'не указан'
-                  )}
-                </span>
-              </div>
+              <h3>Данные аккаунта</h3>
+              <table className={styles.table}>
+                <tbody>
+                  <tr>
+                    <td>Наставник</td>
+                    <td>
+                      {[
+                        refData.rs_surname,
+                        refData.rs_name,
+                        refData.rs_middlename,
+                      ]
+                        .filter((e) => e.length > 0)
+                        .join(' ') || 'Нет'}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={{ border: 0 }}></td>
+                    <td style={{ border: 0 }}></td>
+                  </tr>
+                  <tr>
+                    <td>Фамилия</td>
+                    <td>{data.rs_surname}</td>
+                  </tr>
+                  <tr>
+                    <td>Имя</td>
+                    <td>{data.rs_name}</td>
+                  </tr>
+                  <tr>
+                    <td>Отчество</td>
+                    <td>{data.rs_middlename}</td>
+                  </tr>
+                  <tr>
+                    <td style={{ border: 0 }}></td>
+                    <td style={{ border: 0 }}></td>
+                  </tr>
+                  <tr>
+                    <td>Телефон</td>
+                    <td>{data.rs_phone}</td>
+                  </tr>
+                  <tr>
+                    <td>Город</td>
+                    <td>{data.rs_address}</td>
+                  </tr>
+                  <tr>
+                    <td style={{ border: 0 }}></td>
+                    <td style={{ border: 0 }}></td>
+                  </tr>
+                  <tr>
+                    <td>Логин</td>
+                    <td>{data.rs_login}</td>
+                  </tr>
+                  <tr>
+                    <td>E-mail</td>
+                    <td>
+                      <a href={`mailto:${data.rs_email}`}>{data.rs_email}</a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Telegram</td>
+                    <td>
+                      <a href={`http://t.me/${data.rs_telegramNickname}`}>
+                        {data.rs_telegramNickname}
+                      </a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
 
               <button onClick={logOut} className={styles.form__button}>
                 Выйти из аккаунта

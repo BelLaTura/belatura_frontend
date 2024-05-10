@@ -18,6 +18,7 @@
 }
 
 .form__input {
+    all:unset;
     width: calc(100% - 8px * 2 - 1px * 2);
     padding: 8px;
     border: 1px solid var(--site-color);
@@ -66,4 +67,18 @@
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
     border: 1px solid var(--site-color);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table tr td {
+    border: 1px solid black;
+    padding: 4px;
+}
+
+.form__phone_b {
+    width: 100%;
 }

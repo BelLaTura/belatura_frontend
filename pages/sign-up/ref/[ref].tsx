@@ -3,46 +3,51 @@ import { AxiosError } from 'axios';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import {
-  BelaturaUserCreateBodyDto,
+  BellaturaUserCreateBodyDto,
+  BellaturaUserGetDto,
   emptyBelaturaUserCreate,
+  emptyBellaturaUserGetDto,
 } from '@/types/belatura/api/users';
 import {
-  BelaturaUserFindOneById,
-  BelatureUserCreate,
+  BellaturaUserFindOneById,
+  BellatureUserCreate,
 } from '@/utils/fetch/belatura/users';
 import AppHead from '@/components/AppHead/AppHead';
 import styles from '@/styles/SignUpPage.module.css';
 import AppWrapper from '@/components/AppWrapper/AppWrapper';
 import { BellaturaSessionCreate } from '@/utils/fetch/belatura/sessions';
 import { NominatimOpenstreetmapOrgGetAddress } from '@/utils/fetch/nominatim.openstreetmap.org/getAddress';
-
-const notFoundRefName = 'Нет такого наставника';
+import DateInput from '@/components/DateInput/DateInput';
+import PhoneInput from '@/components/PhoneInput/PhoneInput';
 
 export default function SignUpRefPage() {
   const route = useRouter();
   const { ref } = route.query;
   const [addresses, setAddresses] = useState<string[]>([]);
 
-  const [data, setData] = useState<BelaturaUserCreateBodyDto>(
+  const [data, setData] = useState<BellaturaUserCreateBodyDto>(
     emptyBelaturaUserCreate,
   );
-
-  const [refName, setRefName] = useState<string>(notFoundRefName);
+  const [userData, setUserData] = useState<BellaturaUserGetDto>(
+    emptyBellaturaUserGetDto,
+  );
 
   useEffect(() => {
-    const number = Number(ref) || 1;
+    const number = Number(ref) || -1;
     setData({ ...data, rs_ref: number });
   }, [ref]);
 
   useEffect(() => {
     (async function () {
       const ref = data.rs_ref;
+      if (ref === -1) return;
       try {
-        const userData = await BelaturaUserFindOneById(ref);
-        setRefName(userData.data.rs_initials_name);
+        const userData = await BellaturaUserFindOneById(ref);
+        console.log(userData);
+        setUserData(userData.data);
       } catch (exception) {
-        console.log(`${ref} => ${notFoundRefName}`);
-        setRefName(notFoundRefName);
+        console.log(exception);
+        console.log(`${ref} - нет такого id`);
       }
     })();
   }, [data.rs_ref]);
@@ -61,7 +66,7 @@ export default function SignUpRefPage() {
 
   async function isNotOkCheck() {
     try {
-      const userData = await BelaturaUserFindOneById(data.rs_ref);
+      const userData = await BellaturaUserFindOneById(data.rs_ref);
     } catch (exception) {
       alert('Вы не выбрали наставника');
       return true;
@@ -113,7 +118,7 @@ export default function SignUpRefPage() {
   async function createUser() {
     try {
       if (await isNotOkCheck()) return;
-      const json = await BelatureUserCreate(data);
+      const json = await BellatureUserCreate(data);
       const jSession = await BellaturaSessionCreate({
         rs_loginOrEmail: data.rs_email,
         rs_password: data.rs_password,
@@ -125,7 +130,7 @@ export default function SignUpRefPage() {
       localStorage.setItem('access', accessToken);
       localStorage.setItem('refresh', refreshToken);
 
-      alert(json.message);
+      alert('' + json.message + '\nПодтвердите аккаунт перейдя по ссылке на электронной почте');
       route.replace('/account');
     } catch (exception) {
       if (
@@ -160,20 +165,12 @@ export default function SignUpRefPage() {
             <h1>Регистрация</h1>
             <div>
               <label className={styles.form__label} htmlFor="id">
-                Мой наставник
+                ФИО наставника
               </label>
-              <input
-                className={styles.form__input}
-                id="id"
-                type="number"
-                placeholder="100"
-                value={data.rs_ref}
-                onChange={(event) =>
-                  setData({ ...data, rs_ref: Number(event.target.value) || 0 })
-                }
-              />
-              <div style={{ color: 'grey' }}>
-                {refName} под id = {data.rs_ref}
+              <div>
+                {[userData.rs_surname, userData.rs_name, userData.rs_middlename]
+                  .filter((e) => e.length > 0)
+                  .join(' ')}
               </div>
             </div>
             <br />
@@ -225,32 +222,21 @@ export default function SignUpRefPage() {
             <br />
             <div>
               <label className={styles.form__label} htmlFor="birthday">
-                Дата рождения
+                Дата рождения{' '}
+                {data.rs_birthday.length > 0 ? (
+                  <span style={{ color: 'gray' }}>({data.rs_birthday})</span>
+                ) : null}
               </label>
-              <input
-                className={styles.form__input}
-                id="birthday"
-                type="date"
-                value={data.rs_birthday}
-                onChange={(event) =>
-                  setData({ ...data, rs_birthday: event.target.value })
-                }
-              />
+              <DateInput data={data} setFunc={setData} />
             </div>
             <div>
-              <label className={styles.form__label} htmlFor="phone">
-                Телефон
+              <label className={styles.form__label}>
+                Телефон{' '}
+                {data.rs_phone.length > 0 ? (
+                  <span style={{ color: 'gray' }}>({data.rs_phone})</span>
+                ) : null}
               </label>
-              <input
-                className={styles.form__input}
-                id="phone"
-                type="text"
-                placeholder="+XXXXXXXXXXXX"
-                value={data.rs_phone}
-                onChange={(event) =>
-                  setData({ ...data, rs_phone: event.target.value })
-                }
-              />
+              <PhoneInput value={data.rs_phone} setFunc={setData} data={data} />
             </div>
             <div>
               <label className={styles.form__label} htmlFor="telegram">

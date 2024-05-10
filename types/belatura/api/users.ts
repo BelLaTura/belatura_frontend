@@ -1,6 +1,8 @@
 import ApiResponseDto from './ApiResponse.dto';
 
-export interface BelaturaUserCreateBodyDto {
+// POST /api/v1/users
+
+export interface BellaturaUserCreateBodyDto {
   rs_ref: number;
   rs_email: string;
   rs_login: string;
@@ -14,8 +16,8 @@ export interface BelaturaUserCreateBodyDto {
   rs_telegramNickname: string;
 }
 
-export const emptyBelaturaUserCreate = {
-  rs_ref: 0,
+export const emptyBelaturaUserCreate: BellaturaUserCreateBodyDto = {
+  rs_ref: -1,
   rs_email: '',
   rs_login: '',
   rs_surname: '',
@@ -28,7 +30,7 @@ export const emptyBelaturaUserCreate = {
   rs_telegramNickname: '',
 };
 
-export interface BelaturaUserCreateResponseDataDto {
+export interface BellaturaUserCreateResponseDataDto {
   rs_accessToken: string;
   rs_refreshToken: string;
   rs_ip: string;
@@ -36,27 +38,56 @@ export interface BelaturaUserCreateResponseDataDto {
   rs_userId: number;
 }
 
-export interface BelaturaUserCreateResponseDto extends ApiResponseDto {
-  data: BelaturaUserCreateResponseDataDto;
+export interface BellaturaUserCreateResponseDto extends ApiResponseDto {
+  data: BellaturaUserCreateResponseDataDto;
 }
 
-export interface BelaturaPublicUserDto {
+// GET /api/v1/users
+
+export interface BellaturaUserGetDto {
+  rs_middlename: string;
+  rs_name: string;
+  rs_surname: string;
   rs_id: number;
-  rs_initials_name: string;
-  rs_ref: string;
+  rs_ref: number;
+  rs_address: string;
+  rs_birthday: string;
+  rs_email: string;
+  rs_phone: string;
+  rs_telegramNickname: string;
 }
 
-export interface BelaturaUserGetResponseDto extends ApiResponseDto {
-  data: BelaturaPublicUserDto[];
+export const emptyBellaturaUserGetDto: BellaturaUserGetDto = {
+  rs_middlename: '',
+  rs_name: '',
+  rs_surname: '',
+  rs_id: 0,
+  rs_ref: 0,
+  rs_address: '',
+  rs_birthday: '',
+  rs_email: '',
+  rs_phone: '',
+  rs_telegramNickname: '',
+};
+
+export interface BellaturaUserGetResponseDto extends ApiResponseDto {
+  data: BellaturaUserGetDto[];
 }
 
-export interface BelaturaUserGetByIdResponseDto extends ApiResponseDto {
-  data: BelaturaPublicUserDto;
+// GET /api/v1/users/{id}
+
+export interface BellaturaUserGetByIdResponseDto extends ApiResponseDto {
+  data: BellaturaUserGetDto;
 }
 
-export interface BelaturaUserForgetPasswordResponseDto extends ApiResponseDto {}
+// GET /api/v1/users/x/forget-password
 
-export interface BelaturaUserGetMyDataBodyDto {
+export interface BellaturaUserForgetPasswordResponseDto
+  extends ApiResponseDto {}
+
+// GET /api/v1/users/x/my-data
+
+export interface BellaturaUserGetMyDataBodyDto {
   rs_id: number;
   rs_ref: number;
   rs_email: string;
@@ -70,16 +101,6 @@ export interface BelaturaUserGetMyDataBodyDto {
   rs_telegramNickname: string;
 }
 
-export interface BelaturaUserGetMyDataDto extends ApiResponseDto {
-  data: BelaturaUserGetMyDataBodyDto;
-}
-
-export interface BelaturaUserGetBodyDto {
-  rs_id: number;
-  rs_initials_name: string;
-  rs_ref: number;
-}
-
-export interface BelaturaUserGetDto extends ApiResponseDto {
-  data: BelaturaUserGetBodyDto[];
+export interface BellaturaUserGetMyDataDto extends ApiResponseDto {
+  data: BellaturaUserGetMyDataBodyDto;
 }

@@ -22,3 +22,5 @@ yarn add @fortawesome/free-regular-svg-icons
 yarn add @fortawesome/free-brands-svg-icons
 yarn add @fortawesome/react-fontawesome
 yarn add prettier
+yarn add react-copy-to-clipboard
+yarn add @types/react-copy-to-clipboard

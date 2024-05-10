@@ -5,7 +5,7 @@
 .tree__ul {
     margin: 0;
     padding: 0;
-    padding-left: 1em;
+    padding-left: 2em;
 }
 
 .tree__li {
@@ -21,6 +21,7 @@
     border-color: var(--site-color);
     margin: 8px 0;
     background-color: #fff;
+    position: relative;
 }
 
 .tree__input {
@@ -39,4 +40,25 @@
 .tree__label {
     color: var(--site-color);
     font-weight: bold;
+}
+
+.tree__copy_b {
+    text-align: right;
+}
+
+.tree__copy_b button {
+    margin-left: 1em;
+    border: 1px solid var(--site-color);
+    background-color: var(--site-color);
+    color: white;
+    border-radius: 6px;
+    transition: all ease 0.5s;
+    width: 32px;
+    height: 32px;
+    font-size: 20px;
+}
+
+.tree__copy_b button:hover {
+    background-color: transparent;
+    color: var(--site-color);
 }

@@ -1,0 +1,28 @@
+.wrapper {
+    display: flex;
+    margin: 8px 0 1em 0;
+}
+
+.select_YYYY,
+.select_MM,
+.select_DD {
+    padding: 8px;
+    border: 1px solid var(--site-color);
+    border-radius: 4px;
+    background-color: transparent;
+    margin: 0 4px;
+}
+
+.select_YYYY {
+    width: 100%;
+    margin-right: 0;
+}
+
+.select_MM {
+    width: 100px;
+}
+
+.select_DD {
+    width: 64px;
+    margin-left: 0;
+}
