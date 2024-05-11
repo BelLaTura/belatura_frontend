@@ -10,16 +10,39 @@ import {
   BellaturaSessionCreateBodyDto,
   emptyBellaturaSessionCreateBody,
 } from '@/types/belatura/api/sessions.dto';
+import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { RootStoreDto } from '@/store';
+import { SignUpTypes } from '@/store/reducers/SignUpReducer.dto';
 
 export default function SignIn() {
   const route = useRouter();
   const [data, setData] = useState<BellaturaSessionCreateBodyDto>(
     emptyBellaturaSessionCreateBody,
   );
+  const dispatch = useDispatch();
+  const SignUpData = useSelector(
+    (state: RootStoreDto) => state.SignUpReducer.SignUp,
+  );
 
   async function login() {
+    if (data.rs_loginOrEmail.length === 0) {
+      dispatch({ type: SignUpTypes.SIGN_UP_IS_NOT_VERIFY });
+      alert('Вы не указали логин или электронную почту');
+      return;
+    }
+
+    if (data.rs_password.length === 0) {
+      dispatch({ type: SignUpTypes.SIGN_UP_IS_NOT_VERIFY });
+      alert('Вы не указали пароль');
+      return;
+    }
+
     try {
+      dispatch({ type: SignUpTypes.SIGN_UP });
+      dispatch({ type: SignUpTypes.SIGN_UP_IS_FETCH });
       const response = await BellaturaSessionCreate(data);
+      dispatch({ type: SignUpTypes.SIGN_UP });
       const DATA = response.data;
       const accessToken = DATA.rs_accessToken;
       const refreshToken = DATA.rs_refreshToken;
@@ -27,6 +50,7 @@ export default function SignIn() {
       localStorage.setItem('refresh', refreshToken);
       route.replace('/account');
     } catch (exception) {
+      dispatch({ type: SignUpTypes.SIGN_UP_ERROR, payload: `${exception}` });
       if (
         exception instanceof AxiosError &&
         exception.response &&
@@ -47,6 +71,13 @@ export default function SignIn() {
         return;
       }
 
+      if (exception instanceof AxiosError && exception.response) {
+        alert(
+          `HTTP status: ${exception.response.status}\nMethod: POST\nURL: /api/v1/sessions\nПередайте эти данные программисту`,
+        );
+        return;
+      }
+
       alert('' + exception);
     }
   }
@@ -56,7 +87,7 @@ export default function SignIn() {
       <AppWrapper>
         <div className={styles.form_margins}>
           <div className={styles.form}>
-            <h1>Ввойти в аккаунт</h1>
+            <h1>Войти в аккаунт</h1>
             <div>
               <label className={styles.form__label} htmlFor="loginOrEmail">
                 Логин или email
@@ -87,8 +118,11 @@ export default function SignIn() {
                 }
               />
             </div>
-            <button className={styles.form__button} onClick={login}>
-              Ввойти
+            <button
+              className={styles.form__button}
+              onClick={login}
+              disabled={SignUpData.isFetch}>
+              {SignUpData.isFetch ? 'Данные отправляются...' : 'Ввойти'}
             </button>
             <Link className={styles.from__a} href="/sign-up">
               У меня нет аккаунта
@@ -96,6 +130,13 @@ export default function SignIn() {
             <Link className={styles.from__a} href="/forget-password">
               Забыли пароль
             </Link>
+            {SignUpData.isNotVerify ? (
+              <p style={{ color: 'lightgray' }}>...</p>
+            ) : SignUpData.isFetch ? (
+              <p style={{ color: 'lightgray' }}>Отправка данных</p>
+            ) : SignUpData.error ? (
+              <p style={{ color: 'red' }}>{SignUpData.error}</p>
+            ) : null}
           </div>
         </div>
       </AppWrapper>

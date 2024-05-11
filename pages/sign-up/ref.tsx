@@ -6,7 +6,7 @@ export default function SignUpNoRefPage() {
   const route = useRouter();
 
   useEffect(() => {
-    route.replace('/sign-up/ref/80000001');
+    route.replace('/');
   }, []);
 
   return <AppWrapper />;

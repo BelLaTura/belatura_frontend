@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { AxiosError } from 'axios';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   BellaturaUserCreateBodyDto,
   BellaturaUserGetDto,
@@ -12,13 +13,16 @@ import {
   BellaturaUserFindOneById,
   BellatureUserCreate,
 } from '@/utils/fetch/belatura/users';
+import { RootStoreDto } from '@/store';
 import AppHead from '@/components/AppHead/AppHead';
 import styles from '@/styles/SignUpPage.module.css';
-import AppWrapper from '@/components/AppWrapper/AppWrapper';
-import { BellaturaSessionCreate } from '@/utils/fetch/belatura/sessions';
-import { NominatimOpenstreetmapOrgGetAddress } from '@/utils/fetch/nominatim.openstreetmap.org/getAddress';
 import DateInput from '@/components/DateInput/DateInput';
 import PhoneInput from '@/components/PhoneInput/PhoneInput';
+import AppWrapper from '@/components/AppWrapper/AppWrapper';
+import { SignInTypes } from '@/store/reducers/SignInReducer.dto';
+import { UserGetByIdTypes } from '@/store/reducers/UserGetById.dto';
+import { BellaturaSessionCreate } from '@/utils/fetch/belatura/sessions';
+import { NominatimOpenstreetmapOrgGetAddress } from '@/utils/fetch/nominatim.openstreetmap.org/getAddress';
 
 export default function SignUpRefPage() {
   const route = useRouter();
@@ -32,6 +36,14 @@ export default function SignUpRefPage() {
     emptyBellaturaUserGetDto,
   );
 
+  const dispatch = useDispatch();
+  const SignInData = useSelector(
+    (state: RootStoreDto) => state.SignInReducer.SignIn,
+  );
+  const UserGetByIdData = useSelector(
+    (state: RootStoreDto) => state.UserGetByIdReducer.UserById,
+  );
+
   useEffect(() => {
     const number = Number(ref) || -1;
     setData({ ...data, rs_ref: number });
@@ -42,12 +54,27 @@ export default function SignUpRefPage() {
       const ref = data.rs_ref;
       if (ref === -1) return;
       try {
+        dispatch({ type: UserGetByIdTypes.USER_GET_BY_ID });
+        dispatch({ type: UserGetByIdTypes.USER_GET_BY_ID_IS_FETCH });
         const userData = await BellaturaUserFindOneById(ref);
-        console.log(userData);
+        console.log(userData.data);
+        dispatch({
+          type: UserGetByIdTypes.USER_GET_BY_ID_SUCCESS,
+          payload: userData.data,
+        });
         setUserData(userData.data);
       } catch (exception) {
-        console.log(exception);
-        console.log(`${ref} - нет такого id`);
+        dispatch({
+          type: UserGetByIdTypes.USER_GET_BY_ID_ERROR,
+          payload: `${exception}`,
+        });
+        if (
+          exception instanceof AxiosError &&
+          exception.response &&
+          exception.response.status === 404
+        ) {
+          dispatch({ type: UserGetByIdTypes.USER_GET_BY_ID_IS_NOT_FOUND });
+        }
       }
     })();
   }, [data.rs_ref]);
@@ -66,10 +93,16 @@ export default function SignUpRefPage() {
 
   async function isNotOkCheck() {
     try {
-      const userData = await BellaturaUserFindOneById(data.rs_ref);
+      await BellaturaUserFindOneById(data.rs_ref);
     } catch (exception) {
-      alert('Вы не выбрали наставника');
-      return true;
+      if (
+        exception instanceof AxiosError &&
+        exception.response &&
+        exception.response.status === 404
+      ) {
+        alert('Вы не выбрали наставника');
+        return true;
+      }
     }
 
     if (data.rs_surname.length === 0) {
@@ -117,8 +150,16 @@ export default function SignUpRefPage() {
 
   async function createUser() {
     try {
-      if (await isNotOkCheck()) return;
+      dispatch({ type: SignInTypes.SIGN_IN });
+
+      if (await isNotOkCheck()) {
+        dispatch({ type: SignInTypes.SIGN_IN_IS_NOT_VERIFY });
+        return;
+      }
+
+      dispatch({ type: SignInTypes.SIGN_IN_IS_FETCH });
       const json = await BellatureUserCreate(data);
+      dispatch({ type: SignInTypes.SIGN_IN });
       const jSession = await BellaturaSessionCreate({
         rs_loginOrEmail: data.rs_email,
         rs_password: data.rs_password,
@@ -130,26 +171,44 @@ export default function SignUpRefPage() {
       localStorage.setItem('access', accessToken);
       localStorage.setItem('refresh', refreshToken);
 
-      alert('' + json.message + '\nПодтвердите аккаунт перейдя по ссылке на электронной почте');
+      alert(
+        '' +
+          json.message +
+          '\nПодтвердите аккаунт перейдя по ссылке на электронной почте',
+      );
       route.replace('/account');
     } catch (exception) {
-      if (
-        exception instanceof AxiosError &&
-        exception.response &&
-        exception.response.status === 400
-      ) {
-        const message = exception.response.data.message;
-        alert(message);
-        return;
-      }
+      try {
+        dispatch({ type: SignInTypes.SIGN_IN_ERROR, payload: `${exception}` });
+        if (
+          exception instanceof AxiosError &&
+          exception.response &&
+          exception.response.status === 400
+        ) {
+          const message = exception.response.data.message;
+          alert(message);
+          return;
+        }
 
-      if (
-        exception instanceof AxiosError &&
-        exception.response &&
-        exception.response.status === 409
-      ) {
-        const message = exception.response.data.message;
-        alert(message);
+        if (
+          exception instanceof AxiosError &&
+          exception.response &&
+          exception.response.status === 409
+        ) {
+          const message = exception.response.data.message;
+          alert(message);
+          return;
+        }
+
+        if (exception instanceof AxiosError && exception.response) {
+          alert(
+            `HTTP status: ${exception.response.status}\nMethod: POST\nURL: /api/v1/sessions\nПередайте эти данные программисту`,
+          );
+          return;
+        }
+      } catch (exception) {
+        console.log(exception);
+        alert(exception);
         return;
       }
 
@@ -168,9 +227,27 @@ export default function SignUpRefPage() {
                 ФИО наставника
               </label>
               <div>
-                {[userData.rs_surname, userData.rs_name, userData.rs_middlename]
-                  .filter((e) => e.length > 0)
-                  .join(' ')}
+                {UserGetByIdData.isFetch ? (
+                  <span style={{ color: 'lightgray' }}>
+                    Поиск пользователя по id={data.rs_ref}
+                  </span>
+                ) : UserGetByIdData.isNotFound ? (
+                  <span style={{ color: 'red' }}>
+                    Пользователя нет в базе по id={ref}
+                  </span>
+                ) : UserGetByIdData.error ? (
+                  <span style={{ color: 'red' }}>
+                    {`${UserGetByIdData.error}`}
+                  </span>
+                ) : (
+                  [
+                    UserGetByIdData.data.rs_surname,
+                    UserGetByIdData.data.rs_name,
+                    UserGetByIdData.data.rs_middlename,
+                  ]
+                    .filter((e) => e.length > 0)
+                    .join(' ')
+                )}
               </div>
             </div>
             <br />
@@ -266,17 +343,23 @@ export default function SignUpRefPage() {
                 onChange={(event) =>
                   setData({ ...data, rs_address: event.target.value })
                 }
+                style={{ marginBottom: 0 }}
               />
             </div>
             <select
               className={styles.form__select}
-              onChange={(event) =>
-                setData((data) => ({ ...data, rs_address: event.target.value }))
-              }>
-              {addresses.length &&
-                addresses.map((e) => {
-                  return <option key={e}>{e}</option>;
-                })}
+              onChange={(event) => {
+                const value = event.target.value;
+                if (value.startsWith('Найдено:')) return;
+                setData((data) => ({
+                  ...data,
+                  rs_address: event.target.value,
+                }));
+              }}>
+              <option>Найдено: {addresses.length}</option>
+              {addresses.map((e, i) => {
+                return <option key={`${i}-${e}`}>{e}</option>;
+              })}
             </select>
             <br />
             <div>
@@ -325,12 +408,22 @@ export default function SignUpRefPage() {
               />
             </div>
             <br />
-            <button className={styles.form__button} onClick={createUser}>
-              Регистрация
+            <button
+              className={styles.form__button}
+              onClick={createUser}
+              disabled={SignInData.isFetch}>
+              {SignInData.isFetch ? 'Данные отправляются...' : 'Регистрация'}
             </button>
             <Link className={styles.from__a} href="/sign-in">
               У меня есть аккаунт
             </Link>
+            {SignInData.isNotVerify ? (
+              <p style={{ color: 'lightgray' }}>...</p>
+            ) : SignInData.isFetch ? (
+              <p style={{ color: 'lightgray' }}>Отправка данных</p>
+            ) : SignInData.error ? (
+              <p style={{ color: 'red' }}>{SignInData.error}</p>
+            ) : null}
           </div>
         </div>
       </AppWrapper>

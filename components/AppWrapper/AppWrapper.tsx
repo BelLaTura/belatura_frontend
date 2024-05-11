@@ -1,12 +1,12 @@
-import { ReactNode } from 'react';
-import styles from './AppWrapper.module.css';
 import Link from 'next/link';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { ReactNode } from 'react';
 import {
   IconDefinition,
   faTree,
   faUser,
 } from '@fortawesome/free-solid-svg-icons';
+import styles from './AppWrapper.module.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 interface IProps {
   children?: ReactNode;
