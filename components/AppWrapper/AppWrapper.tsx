@@ -1,12 +1,13 @@
-import Link from 'next/link';
 import { ReactNode } from 'react';
 import {
   IconDefinition,
   faTree,
   faUser,
 } from '@fortawesome/free-solid-svg-icons';
+import AppNav from '../AppNav/AppNav';
+import IsVerify from '../IsVerify/IsVerify';
 import styles from './AppWrapper.module.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import AppFooter from '../AppFooter/AppFooter';
 
 interface IProps {
   children?: ReactNode;
@@ -25,9 +26,18 @@ const menu: IMenu[] = [
 
 export default function AppWrapper(props: IProps) {
   return (
-    <div className={styles.wrapper}>
-      <div className={styles.wrapper__content}>{props.children}</div>
-      <div className={styles.wrapper__footer}>
+    <IsVerify>
+      <div className={styles.image_block}>
+        <div className={styles.wrapper}>
+          <div className={styles.wrapper__content}>
+            <AppNav />
+            {props.children}
+          </div>
+          {/* <div className={styles.wrapper__footer}> */}
+          <AppFooter />
+          {/* </div> */}
+        </div>
+        {/* <div className={styles.wrapper__footer}>
         <ul className={styles.wrapper__ul}>
           {menu.map((e) => {
             return (
@@ -42,7 +52,8 @@ export default function AppWrapper(props: IProps) {
             );
           })}
         </ul>
+      </div> */}
       </div>
-    </div>
+    </IsVerify>
   );
 }

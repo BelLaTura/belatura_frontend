@@ -88,3 +88,21 @@
 .form__phone_b {
     width: 100%;
 }
+
+.app__table_wrapper {
+    overflow-x: scroll;
+    padding: 16px;
+    background-color: white;
+    border-radius: 8px;
+    border: 1px solid var(--site-color);
+}
+
+.app__table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.app__table tr td {
+    border: 1px solid black;
+    padding: 8px;
+}

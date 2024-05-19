@@ -1,0 +1,7 @@
+.post_block {
+    background-color: var(--site-color-2-rgba2);
+    padding: 8px;
+    border-radius: 8px;
+    margin: 8px 0;
+    border: 1px solid var(--site-color);
+}

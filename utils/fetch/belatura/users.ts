@@ -5,7 +5,6 @@ import {
   BellaturaUserCreateResponseDto,
   BellaturaUserForgetPasswordResponseDto,
   BellaturaUserGetByIdResponseDto,
-  BellaturaUserGetDto,
   BellaturaUserGetMyDataDto,
   BellaturaUserGetResponseDto,
 } from '@/types/belatura/api/users';

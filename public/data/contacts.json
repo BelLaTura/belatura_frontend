@@ -1,0 +1,46 @@
+[
+  {
+    "title": "Владелец",
+    "text": "ИП Туркевич Жанна Констатиновна, Республика Беларусь, 224022, г. Брест, ул. 28 июля, 3Б, кв. 43\nУНП 291864818\nр/с BY80PJCB30135067641000000933 в ОАО \"Приорбанк\", БИК PJCBBY2X\nр/с BY13OLMP30140900000303065703 в ОАО \"Белгазпромбанк\", БИК BAPBBY2X",
+    "lst_contacts": [
+      {
+        "type": "phone",
+        "value": "+375-33-690-80-01"
+      },
+      {
+        "type": "email",
+        "value": "shannatur@rambler.ru"
+      },
+      {
+        "type": "telegram",
+        "value": "Shannatur"
+      },
+      {
+        "type": "whatsapp",
+        "value": "+375-33-690-80-01"
+      },
+      {
+        "type": "viber",
+        "value": "+375-33-690-80-01"
+      },
+      {
+        "type": "yandex-map-src",
+        "value": "https://yandex.by/map-widget/v1/?ll=23.749291%2C52.072469&mode=search&ol=geo&ouri=ymapsbm1%3A%2F%2Fgeo%3Fdata%3DCgg2NjU3Nzk3NBI_0JHQtdC70LDRgNGD0YHRjCwg0JHRgNGN0YHRgiwg0LLRg9C70ZbRhtCwIDI4INCb0ZbQv9C10L3RjywgM9CRIgoNjf69QRU2SlBC&z=16.69"
+      },
+      {
+        "type": "google-map-pb",
+        "value": "!1m18!1m12!1m3!1d2452.3933017004747!2d23.74671967635213!3d52.07256986925997!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47210c364a6265bf%3A0x69c4c584a7462b4b!2svulica%2028%20Lipienia%203%D0%91%2C%20Brest%2C%20Brest%20Region%20224022!5e0!3m2!1sen!2sby!4v1716141692626!5m2!1sen!2sby"
+      }
+    ]
+  },
+  {
+    "title": "Отдел ИТ",
+    "text": "Здравствуйте. Если вы хотите сообщить про ошибку, баг на сайте, то пишите на почту.\nПожалуйста, прикрепляйте скриншот и пояснение как произошла ошибка",
+    "lst_contacts": [
+      {
+        "type": "email",
+        "value": "it@bellatura.by"
+      }
+    ]
+  }
+]

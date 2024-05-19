@@ -6,9 +6,5 @@ interface IProps {
 }
 
 export default function AppContainer(props: IProps) {
-  return (
-    <div className={styles.wrapper}>
-      <div className={styles.wrapper__content}>{props.children}</div>
-    </div>
-  );
+  return <div className={styles.wrapper}>{props.children}</div>;
 }

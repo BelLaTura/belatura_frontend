@@ -1,6 +1,7 @@
 .wrapper {
     width: calc(100% - 8px);
     margin: 0 auto;    
+    max-width: 1024px;
 }
 
 .wrapper__content {

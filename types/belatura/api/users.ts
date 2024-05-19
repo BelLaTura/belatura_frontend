@@ -101,6 +101,21 @@ export interface BellaturaUserGetMyDataBodyDto {
   rs_telegramNickname: string;
 }
 
+export const emptyBellaturaUserGetMyDataBodyDto: BellaturaUserGetMyDataBodyDto =
+  {
+    rs_address: '',
+    rs_birthday: '',
+    rs_email: '',
+    rs_id: 0,
+    rs_login: '',
+    rs_middlename: '',
+    rs_name: '',
+    rs_phone: '',
+    rs_ref: 0,
+    rs_surname: '',
+    rs_telegramNickname: '',
+  };
+
 export interface BellaturaUserGetMyDataDto extends ApiResponseDto {
   data: BellaturaUserGetMyDataBodyDto;
 }

@@ -1,0 +1,14 @@
+{
+  "title": "БелЛаТура",
+  "work-time": "8:00 - 17:00",
+  "lst_contacts": [
+    {
+      "type": "phone",
+      "value": "+375-33-690-80-01"
+    },
+    {
+      "type": "email",
+      "value": "shannatur@rambler.ru"
+    }
+  ]
+}

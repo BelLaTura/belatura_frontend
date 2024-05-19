@@ -1,5 +1,5 @@
-import ReduxProvider from '@/components/ReduxProvider/ReduxProvider';
 import { Html, Head, Main, NextScript } from 'next/document';
+import ReduxProvider from '@/components/ReduxProvider/ReduxProvider';
 
 export default function Document() {
   return (
@@ -46,9 +46,15 @@ export default function Document() {
         :root {
           --site-color: #081c90;
           --site-color-2: #dac10f;
-          --site-color-2-rgba2: rgba(218, 193, 15, 0.8);;
+          --site-color-2-rgba2: rgba(218, 193, 15, 0.8);
           --site-color-2-rgba: rgba(163, 45, 19, 0.8);
           --site-color-3: #00ab4f;
+          --scrollbarBgColor: rgba(0, 102, 204, 0.4);
+          --scrollbarThumbColor: #06c;
+          --scrollbarThumbColorSecond: #06c;
+          --scrollbarWidth: 1rem;
+          --scrollbarBorder: 0 solid var(--scrollbarBgColor);
+          --scrollbarBorderRadius: calc(var(--scrollbarWidth) / 10);
         }
 
         h1, h2, h3, h4, h5, h6 {

@@ -1,6 +1,6 @@
-import AppEnv from '@/utils/app-env';
 import Head from 'next/head';
 import { ReactNode } from 'react';
+import OrgData from '@/public/data/organization-data.json';
 
 interface IProps {
   children: ReactNode;
@@ -13,7 +13,7 @@ export default function AppHead(props: IProps) {
     <>
       <Head>
         <title>
-          {props.title ? `${props.title} | ${AppEnv.TITLE}` : 'Страница'}
+          {props.title ? `${props.title} | ${OrgData.title}` : 'Страница'}
         </title>
         <meta name="description" content={props.description || '...'} />
       </Head>

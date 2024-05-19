@@ -18,3 +18,22 @@ export async function BellaturaSessionCreate(
 
   throw new Error('' + response.status);
 }
+
+export async function BellaturaSessionIsVerify() {
+  const BACKNED_URL = AppEnv.BACKEND_URL;
+  const URL = `${BACKNED_URL}/api/v1/sessions/x/is-verify`;
+  const response = await axios.post(
+    URL,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('access')}`,
+      },
+    },
+  );
+  if (response.status === 200) {
+    return true;
+  }
+
+  throw new Error('' + response.status);
+}

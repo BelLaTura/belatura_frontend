@@ -1,84 +1,65 @@
-import Link from 'next/link';
 import { AxiosError } from 'axios';
+import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import {
+  BellaturaUserGetMyDataBodyDto,
+  emptyBellaturaUserGetMyDataBodyDto,
+} from '@/types/belatura/api/users';
 import AppEnv from '@/utils/app-env';
-import styles from '@/styles/SignUpPage.module.css';
+import { RootStoreDto } from '@/store';
 import AppHead from '@/components/AppHead/AppHead';
+import styles from '@/styles/SignUpPage.module.css';
+import { VerifyTypes } from '@/types/redux/is-verify';
 import AppWrapper from '@/components/AppWrapper/AppWrapper';
 import AppContainer from '@/components/AppContainer/AppContainer';
-import {
-  BellaturaUserGetDto,
-  BellaturaUserGetMyDataBodyDto,
-  emptyBellaturaUserGetDto,
-} from '@/types/belatura/api/users';
-import {
-  BellaturaUserFindOneById,
-  BellaturaUserGetMyData,
-} from '@/utils/fetch/belatura/users';
+import { BellaturaUserGetMyData } from '@/utils/fetch/belatura/users';
+import IsNotAuthBlock from '@/components/IsNotAuthBlock/IsNotAuthBlock';
+import { BellaturaSessionIsVerify } from '@/utils/fetch/belatura/sessions';
+import AppColorPostBlock from '@/components/AppColorPostBlock/AppColorPostBlock';
+
+const SEO_TITLE = 'Моя страница';
+const SEO_DESCRIPTION = 'Моя страница';
 
 export default function AccountPage() {
-  const [isLogin, setIsLogin] = useState<boolean>(false);
-  const [data, setData] = useState<BellaturaUserGetMyDataBodyDto>({
-    rs_address: '',
-    rs_birthday: '',
-    rs_email: '',
-    rs_id: 0,
-    rs_login: '',
-    rs_middlename: '',
-    rs_name: '',
-    rs_phone: '',
-    rs_ref: 0,
-    rs_surname: '',
-    rs_telegramNickname: '',
-  });
-  const [refData, setRefData] = useState<BellaturaUserGetDto>(
-    emptyBellaturaUserGetDto,
+  const dispatch = useDispatch();
+  const VerifyData = useSelector((state: RootStoreDto) => state.VerifyReducer);
+
+  const [data, setData] = useState<BellaturaUserGetMyDataBodyDto>(
+    emptyBellaturaUserGetMyDataBodyDto,
   );
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    const accessToken = localStorage.getItem('access') || '';
-    if (accessToken.length === 0) {
-      setIsLogin(false);
-      return;
-    }
-
-    setIsLogin(true);
     (async function () {
-      let ref = 0;
       try {
-        const jData = await BellaturaUserGetMyData();
-        setData(jData.data);
-        setIsLogin(true);
-        ref = jData.data.rs_ref;
+        setIsLoading(true);
+        await BellaturaSessionIsVerify();
+        setIsLoading(false);
+        dispatch({ type: VerifyTypes.IS_VERIFY_TRUE });
       } catch (exception) {
+        setIsLoading(false);
         if (
           exception instanceof AxiosError &&
           exception.response &&
           exception.response.status === 401
         ) {
-          localStorage.removeItem('access');
-          localStorage.removeItem('refresh');
+          dispatch({ type: VerifyTypes.IS_VERIFY_FALSE });
           return;
         }
 
-        alert(exception);
-        setIsLogin(false);
+        return;
       }
 
       try {
-        const jRefData = await BellaturaUserFindOneById(ref);
-        setRefData(jRefData.data);
+        setIsLoading(true);
+        const jRefData = await BellaturaUserGetMyData();
+        setIsLoading(false);
+        setData(jRefData.data);
       } catch (exception) {
-        if (
-          exception instanceof AxiosError &&
-          exception.response &&
-          exception.response.status === 404
-        ) {
-          setRefData(emptyBellaturaUserGetDto);
-          return;
-        }
         alert(exception);
+        return;
       }
     })();
   }, []);
@@ -86,15 +67,54 @@ export default function AccountPage() {
   function logOut() {
     localStorage.removeItem('access');
     localStorage.removeItem('refresh');
-    setIsLogin(false);
+    dispatch({ type: VerifyTypes.IS_VERIFY_FALSE });
   }
 
-  if (isLogin) {
+  if (isLoading) {
     return (
-      <AppHead title="Моя страница" description="Моя страница">
+      <AppHead title={SEO_TITLE} description={SEO_DESCRIPTION}>
         <AppWrapper>
-          <div className={styles.form_margins}>
-            <div className={styles.form}>
+          <AppContainer>
+            <AppColorPostBlock>
+              <p>Загрузка данных...</p>
+            </AppColorPostBlock>
+          </AppContainer>
+        </AppWrapper>
+      </AppHead>
+    );
+  }
+
+  if (VerifyData.isVerify) {
+    const {
+      rs_address: address,
+      rs_birthday: birthday,
+      rs_email: email,
+      rs_id: id,
+      rs_login: login,
+      rs_middlename: middlename,
+      rs_name: name,
+      rs_phone: phone,
+      rs_ref: ref,
+      rs_surname: surname,
+      rs_telegramNickname: teleram,
+    } = data;
+
+    const telegramNickname = teleram
+      .replace('@', '')
+      .replace('https://t.me/', '');
+    const telegramLink = `https://t.me/${telegramNickname}`;
+
+    const bd_date = new Date(birthday);
+    const bd_YYYY = bd_date.getFullYear();
+    const bd_MM = ('' + (bd_date.getMonth() + 1)).padStart(2, '0');
+    const bd_DD = ('' + bd_date.getDate()).padStart(2, '0');
+    const birthday_string = `${bd_YYYY}.${bd_MM}.${bd_DD}`;
+
+    return (
+      <AppHead title={SEO_TITLE} description={SEO_DESCRIPTION}>
+        <AppWrapper>
+          <AppContainer>
+            <AppColorPostBlock>
               <h1>Моя страница</h1>
 
               <h3>Реферальная ссылка</h3>
@@ -116,99 +136,86 @@ export default function AccountPage() {
               </CopyToClipboard>
 
               <h3>Данные аккаунта</h3>
-              <table className={styles.table}>
-                <tbody>
-                  <tr>
-                    <td>Наставник</td>
-                    <td>
-                      {[
-                        refData.rs_surname,
-                        refData.rs_name,
-                        refData.rs_middlename,
-                      ]
-                        .filter((e) => e.length > 0)
-                        .join(' ') || 'Нет'}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style={{ border: 0 }}></td>
-                    <td style={{ border: 0 }}></td>
-                  </tr>
-                  <tr>
-                    <td>Фамилия</td>
-                    <td>{data.rs_surname}</td>
-                  </tr>
-                  <tr>
-                    <td>Имя</td>
-                    <td>{data.rs_name}</td>
-                  </tr>
-                  <tr>
-                    <td>Отчество</td>
-                    <td>{data.rs_middlename}</td>
-                  </tr>
-                  <tr>
-                    <td style={{ border: 0 }}></td>
-                    <td style={{ border: 0 }}></td>
-                  </tr>
-                  <tr>
-                    <td>Телефон</td>
-                    <td>{data.rs_phone}</td>
-                  </tr>
-                  <tr>
-                    <td>Город</td>
-                    <td>{data.rs_address}</td>
-                  </tr>
-                  <tr>
-                    <td style={{ border: 0 }}></td>
-                    <td style={{ border: 0 }}></td>
-                  </tr>
-                  <tr>
-                    <td>Логин</td>
-                    <td>{data.rs_login}</td>
-                  </tr>
-                  <tr>
-                    <td>E-mail</td>
-                    <td>
-                      <a href={`mailto:${data.rs_email}`}>{data.rs_email}</a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Telegram</td>
-                    <td>
-                      <a href={`http://t.me/${data.rs_telegramNickname}`}>
-                        {data.rs_telegramNickname}
-                      </a>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              <div className={styles.app__table_wrapper}>
+                <table className={styles.app__table}>
+                  <tbody>
+                    <tr>
+                      <td>Мой ID</td>
+                      <td>{id}</td>
+                    </tr>
+                    <tr>
+                      <td style={{ border: 0 }}></td>
+                      <td style={{ border: 0 }}></td>
+                    </tr>
+                    <tr>
+                      <td>Фамилия</td>
+                      <td>{surname}</td>
+                    </tr>
+                    <tr>
+                      <td>Имя</td>
+                      <td>{name}</td>
+                    </tr>
+                    <tr>
+                      <td>Отчество</td>
+                      <td>{middlename}</td>
+                    </tr>
+                    <tr>
+                      <td>Дата рождения</td>
+                      <td>{birthday_string}</td>
+                    </tr>
+                    <tr>
+                      <td style={{ border: 0 }}></td>
+                      <td style={{ border: 0 }}></td>
+                    </tr>
+                    <tr>
+                      <td>Телефон</td>
+                      <td>{phone}</td>
+                    </tr>
+                    <tr>
+                      <td>Город</td>
+                      <td>{address}</td>
+                    </tr>
+                    <tr>
+                      <td style={{ border: 0 }}></td>
+                      <td style={{ border: 0 }}></td>
+                    </tr>
+                    <tr>
+                      <td>Логин</td>
+                      <td>{login}</td>
+                    </tr>
+                    <tr>
+                      <td>E-mail</td>
+                      <td>
+                        <a href={`mailto:${email}`}>{email}</a>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Telegram</td>
+                      <td>
+                        {telegramNickname.length === 0 ? (
+                          'не указан'
+                        ) : (
+                          <a href={telegramLink}>{telegramNickname}</a>
+                        )}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
 
               <button onClick={logOut} className={styles.form__button}>
                 Выйти из аккаунта
               </button>
-            </div>
-          </div>
+            </AppColorPostBlock>
+          </AppContainer>
         </AppWrapper>
       </AppHead>
     );
   }
 
   return (
-    <AppHead title="Моя страница" description="Моя страница">
-      <AppWrapper>
-        <AppContainer>
-          <h1>Страница пользователя</h1>
-
-          <h2>Вы не вошли в аккаунт</h2>
-
-          <p style={{ textAlign: 'center' }}>
-            <Link href="/sign-up">Регистрация</Link>
-          </p>
-          <p style={{ textAlign: 'center' }}>
-            <Link href="/sign-in">Вход</Link>
-          </p>
-        </AppContainer>
-      </AppWrapper>
+    <AppHead title={SEO_TITLE} description={SEO_DESCRIPTION}>
+      <IsNotAuthBlock />
     </AppHead>
   );
 }

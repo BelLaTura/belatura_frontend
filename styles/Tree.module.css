@@ -73,7 +73,8 @@
 }
 
 .tree__details {
-    padding: 1em 0 0 0.5em;
+    padding: 1em 0 0 2em;
+    min-width: 500px;
 }
 
 .tree__summary {
@@ -139,4 +140,19 @@
 
 .form__button--telegram:hover {
     color: #30a7df;
+}
+
+.first_line__table_wrapper {
+    overflow-x: scroll;
+}
+
+.first_line__table {
+    width: 100%;
+    background-color: white;
+    border-collapse: collapse;
+}
+
+.first_line__table tr td {
+    border: 1px solid black;
+    padding: 8px;
 }

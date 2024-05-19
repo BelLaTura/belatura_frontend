@@ -2,18 +2,19 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { AxiosError } from 'axios';
 import { useRouter } from 'next/router';
-import AppHead from '@/components/AppHead/AppHead';
-import styles from '@/styles/SignUpPage.module.css';
-import AppWrapper from '@/components/AppWrapper/AppWrapper';
-import { BellaturaSessionCreate } from '@/utils/fetch/belatura/sessions';
+import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { RootStoreDto } from '@/store';
 import {
   BellaturaSessionCreateBodyDto,
   emptyBellaturaSessionCreateBody,
 } from '@/types/belatura/api/sessions.dto';
-import { useDispatch } from 'react-redux';
-import { useSelector } from 'react-redux';
-import { RootStoreDto } from '@/store';
+import AppHead from '@/components/AppHead/AppHead';
+import styles from '@/styles/SignUpPage.module.css';
+import { VerifyTypes } from '@/types/redux/is-verify';
+import AppWrapper from '@/components/AppWrapper/AppWrapper';
 import { SignUpTypes } from '@/store/reducers/SignUpReducer.dto';
+import { BellaturaSessionCreate } from '@/utils/fetch/belatura/sessions';
 
 export default function SignIn() {
   const route = useRouter();
@@ -48,6 +49,7 @@ export default function SignIn() {
       const refreshToken = DATA.rs_refreshToken;
       localStorage.setItem('access', accessToken);
       localStorage.setItem('refresh', refreshToken);
+      dispatch({ type: VerifyTypes.IS_VERIFY_TRUE });
       route.replace('/account');
     } catch (exception) {
       dispatch({ type: SignUpTypes.SIGN_UP_ERROR, payload: `${exception}` });

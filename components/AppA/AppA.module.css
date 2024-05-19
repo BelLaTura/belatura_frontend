@@ -1,0 +1,16 @@
+.a {
+    text-decoration: none;
+    border: 1px solid var(--site-color);
+    background-color: var(--site-color);
+    color: white;
+    padding: 8px;
+    border-radius: 8px;
+    margin: 8px 0;
+    display: block;
+    text-align: center;
+}
+
+.a:hover {
+    color: var(--site-color);
+    background-color: transparent;
+}
