@@ -62,3 +62,81 @@
     background-color: transparent;
     color: var(--site-color);
 }
+
+.tree__out_wrapper {
+    background-color: white;
+    margin: 8px;
+    border: 1px solid var(--site-color);
+    border-radius: 4px;
+    padding: 8px;
+    overflow-x: scroll;
+}
+
+.tree__details {
+    padding: 1em 0 0 0.5em;
+}
+
+.tree__summary {
+    list-style-type: none;
+    position: relative;
+    padding-left: 1.3em;
+}
+
+.tree__summary::before {
+    content: '+';
+    position: absolute;
+    top: 1px;
+    left: 0;
+    width: 1em;
+    height: 1em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--site-color);
+    color: white;
+    border-radius: 50%;
+    transition: all ease 0.5s;
+    border: 1px solid var(--site-color);
+}
+
+.tree__details[open]>.tree__summary::before {
+    content: '-';
+    background-color: white;
+    color: var(--site-color);
+}
+
+.tree__email {
+    padding-left: 0.5em;
+}
+
+
+.tree__buttons {
+    padding-left: 0.5em;
+}
+
+.form__button {
+    color: white;
+    background-color: var(--site-color);
+    border: 1px solid var(--site-color);
+    margin: 8px;
+    border-radius: 50%;
+    padding: 4px;
+    transition: all ease 0.5s;
+    font-size: 1.2em;
+    width: 2em;
+    height: 2em;
+}
+
+.form__button:hover {
+    background-color: white;
+    color: var(--site-color);
+}
+
+.form__button--telegram {
+    background-color: #30a7df;
+    border-color: #30a7df;
+}
+
+.form__button--telegram:hover {
+    color: #30a7df;
+}

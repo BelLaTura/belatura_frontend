@@ -23,7 +23,7 @@ export default function PhoneInput(props: IProps) {
     isoCode: 'BY',
     flag: 'https://cdn.kcak11.com/CountryFlags/countries/by.svg',
   });
-  const [numberTail, setNumberTail] = useState<number>(0);
+  const [numberTail, setNumberTail] = useState<string>('');
 
   function selectCountry(obj: CountryJSON) {
     setPhoneObject(obj);
@@ -58,7 +58,7 @@ export default function PhoneInput(props: IProps) {
           maxLength={12}
           value={numberTail}
           onChange={(event) =>
-            setNumberTail(Number(event.target.value.replace(/\D/g, '')))
+            setNumberTail(event.target.value.replace(/\D/g, ''))
           }
         />
       </div>

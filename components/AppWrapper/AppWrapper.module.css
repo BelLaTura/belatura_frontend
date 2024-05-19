@@ -6,7 +6,8 @@
     font-family: Roboto;
     width: 100%;
     height: 100%;
-    background-image: url('/images/scale_1200.jpeg');
+    /* background-image: url('/images/scale_1200.jpeg'); */
+    background-image: url('/images/ai_1024x1024.jpg');
     background-repeat: no-repeat;
     background-position: center center;
     background-size: cover;
