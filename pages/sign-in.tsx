@@ -124,7 +124,7 @@ export default function SignIn() {
               className={styles.form__button}
               onClick={login}
               disabled={SignUpData.isFetch}>
-              {SignUpData.isFetch ? 'Данные отправляются...' : 'Ввойти'}
+              {SignUpData.isFetch ? 'Данные отправляются...' : 'Войти'}
             </button>
             <Link className={styles.from__a} href="/sign-up">
               У меня нет аккаунта
